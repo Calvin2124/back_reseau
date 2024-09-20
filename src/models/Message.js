@@ -11,6 +11,6 @@ const Message = sequelize.define('Message', {
     type: DataTypes.TEXT,
     allowNull: false
     }
-});
+    });
 
 module.exports = Message;

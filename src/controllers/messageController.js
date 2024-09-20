@@ -2,7 +2,6 @@ const { Message, User } = require('../models');
 
 exports.createMessage = async (req, res, next) => {
     try {
-        console.log('Données reçues:', req.body);
         const { idUser, content } = req.body;
 
         if (!idUser) {
@@ -10,7 +9,6 @@ exports.createMessage = async (req, res, next) => {
         }
 
         const user = await User.findByPk(idUser);
-        console.log('Utilisateur trouvé:', user);
 
         if (!user) {
             return res.status(404).json({ message: 'Utilisateur non trouvé' });
@@ -21,12 +19,8 @@ exports.createMessage = async (req, res, next) => {
             content: content,
             UserId: user.id  // Assurez-vous que c'est le nom correct de la colonne dans votre base de données
         });
-
-        console.log('Message créé:', message.toJSON());
-
         res.status(201).json({ message: 'Message créé avec succès', messageId: message.id });
     } catch (err) {
-        console.error('Erreur lors de la création du message:', err);
         next(err);
     }
 }
@@ -58,9 +52,13 @@ exports.getMessage = async (req, res, next) => {
 ;    }
 }
 
-exports.getMessages = async (req, res, next) => {
+exports.getAllMessages = async (req, res, next) => {
     try{
-        const messages = await Message.findAll();
+        const messages = await Message.findAll(
+            {
+                include : [{ model: User, as : 'User', attributes: ['username']}]
+            }
+        );
         res.status(200).json({ message: 'Messages trouvés', messages });
     }catch(err) {
         next(err)
