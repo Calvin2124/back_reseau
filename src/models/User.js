@@ -3,31 +3,33 @@ const sequelize = require('../config/database');
 const bcrypt = require('bcryptjs');
 
 const User = sequelize.define('User', {
-    name : {
-        type: DataTypes.STRING,
-        allowNull: false,
+    id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+    },
+    username: {
+    type: DataTypes.STRING,
+    allowNull: false,
     },
     email: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-        validate : {
-            isEmail: true
-        }
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true
     },
-    password: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
+    password_hash: {
+    type: DataTypes.STRING,
+    allowNull: false
+    }
 });
 
 User.beforeCreate(async (user) => {
     const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(user.password, salt);
+    user.password_hash = await bcrypt.hash(user.password_hash, salt);
 })
 
-User.prototype.comparePassword = async function(password) {
-    return await bcrypt.compare(password, this.password);
+User.prototype.comparePassword = async function(password_hash) {
+    return await bcrypt.compare(password_hash, this.password_hash);
 }
 
 module.exports = User;
